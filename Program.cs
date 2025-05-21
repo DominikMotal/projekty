@@ -1,79 +1,120 @@
-﻿namespace cisla;
+﻿using System;
+using System.Threading;
 
-class Program
+namespace Obesenec
 {
-    static void Main(string[] args)
+    class Program
     {
-        while(true)
+        static void Main(string[] args)
         {
+            string[] slova = { "auto", "skola", "barva", "nehoda", "program", "jablko", "jidlo" };
             Random rnd = new Random();
-            int cislo = rnd.Next (1,100);
-            int cislotip = 0;
-
-
-            Console.WriteLine("Hádej číslo od 1-100");
-
-            while(cislotip!=cislo)
-            {
-                
+            string tajneslovo = slova[rnd.Next(slova.Length)];
             
-                Console.Write("Zadej číslo 1-100: ");
-                
-                 Console.ForegroundColor = ConsoleColor.DarkGreen;
-                 string vstup = Console.ReadLine();
-                 Console.ResetColor();
+            char[] uhodnute = new string('_', tajneslovo.Length).ToCharArray();
+            char[] pouzitetipy = new char[20];
+            int pocetpouzitychpis = 0;
+            int pokusy = 0;
+           
 
-                 if(!int.TryParse(vstup , out cislotip))
-                 {
-                    Console.WriteLine("Zadávej jenom čísla 😡");
-                    continue;
-                 }
-                 
+            while (true)
+            {
+                Console.Clear();
 
-
-                if(cislotip <cislo) 
-                {
-                  Console.WriteLine("Zadej větší číslo");
-                }
-                else if ( cislotip >cislo)
-                {
-                    Console.WriteLine("Zadej menší číslo");
-                }
-                else
-                {
-                    Console.ForegroundColor = ConsoleColor.DarkYellow;
-                    Console.WriteLine("správně 😎")  ;  
-                    Console.ResetColor();
-                }
-                
-
-                 
-
+                 int barvy = 10 - pokusy;
+            if (barvy >= 7)
+            {
+                Console.ForegroundColor = ConsoleColor.Green;
+            }
+            else if (barvy >= 4)
+            {
+                Console.ForegroundColor = ConsoleColor.DarkYellow;
 
             }
-             Console.ForegroundColor = ConsoleColor.Blue;
-            Console.WriteLine("chceš hrát znovu? a/n");
-            Console.ResetColor();
-            
-            string odp = Console.ReadLine();
-
-            switch (odp)
+            else
             {
-                case  "a":
-                break;
-
-                case  "n":
-                Thread.Sleep(500);
-                Console.ForegroundColor = ConsoleColor.DarkGreen;
-                Console.WriteLine("Díky za hru");
-                 Console.ResetColor();
-                 Thread.Sleep(500);
-                return;
-                default:
-             Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("neplatná odpověd");
+                Console.ForegroundColor = ConsoleColor.Red;
+            }
+                Console.WriteLine($"Zbývající pokusy: {barvy}");
                 Console.ResetColor();
-                return;
+
+
+                Console.WriteLine("Slovo: " + new string(uhodnute));
+                Console.Write("Použité písmena: ");
+                for (int i = 0; i < pocetpouzitychpis; i++)
+                {
+                    Console.Write(pouzitetipy[i] + " ");
+                }
+                Console.WriteLine();
+
+                Console.WriteLine("Zadej písmeno (nebo konec):");
+                string vstup = Console.ReadLine();
+
+                if (vstup == "konec")
+                    break;
+
+                if (vstup.Length != 1 || !char.IsLetter(vstup[0]))
+                {
+                    Console.WriteLine("Zadej prosím 1 platné písmeno!");
+                    Thread.Sleep(1000);
+                    continue;
+                }
+
+                char tip = vstup[0];
+
+                if (Array.IndexOf(pouzitetipy, tip, 0, pocetpouzitychpis) != -1)
+                {
+                    Console.WriteLine("Toto písmeno už jsi zkoušel.");
+                    Thread.Sleep(1000);
+                    continue;
+                }
+
+                pouzitetipy[pocetpouzitychpis++] = tip;
+
+                bool nasel = false;
+                for (int i = 0; i < tajneslovo.Length; i++)
+                {
+                    if (tajneslovo[i] == tip)
+                    {
+                        uhodnute[i] = tip;
+                        nasel = true;
+                    }
+                }
+
+                if (!nasel)
+                {
+                    pokusy++;
+                }
+
+                if (!uhodnute.Contains('_'))
+                {
+                    Console.Clear();
+                    Console.WriteLine("Gratuluji, uhodl jsi slovo: " + tajneslovo);
+                    Console.WriteLine("Chceš hrát znovu? (a/n)");
+                    string odp = Console.ReadLine();
+
+                    if (odp == "a")
+                    {
+                        tajneslovo = slova[rnd.Next(slova.Length)];
+                        uhodnute = new string('_', tajneslovo.Length).ToCharArray();
+                        pouzitetipy = new char[20];
+                        pocetpouzitychpis = 0;
+                        pokusy = 0;
+                        continue;
+                    }
+                    else
+                    {
+                        Console.WriteLine("Díky za hru!");
+                        break;
+                    }
+                }
+
+                if (pokusy >= 10)
+                {
+                    Console.Clear();
+                    Console.WriteLine(" Slovo bylo: " + tajneslovo);
+                    break;
+                }
             }
         }
     }
